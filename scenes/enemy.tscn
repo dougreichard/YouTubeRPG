@@ -1,4 +1,4 @@
-[gd_scene load_steps=71 format=3 uid="uid://d32318q2eh4vh"]
+[gd_scene load_steps=72 format=3 uid="uid://d32318q2eh4vh"]
 
 [ext_resource type="Script" path="res://scripts/enemy.gd" id="1_3x2em"]
 [ext_resource type="Texture2D" uid="uid://b0fusdnkcb317" path="res://sprites/characters/slime.png" id="1_svxlb"]
@@ -281,7 +281,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_cw2wx")
 }],
-"loop": true,
+"loop": false,
 "name": &"death",
 "speed": 5.0
 }, {
@@ -529,6 +529,9 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_xo02r"]
 radius = 58.3095
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_ydo77"]
+radius = 13.0384
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_hb2qo"]
 radius = 4.0
 
@@ -539,9 +542,8 @@ script = ExtResource("1_3x2em")
 texture_filter = 1
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_yiyof")
-animation = &"idle_side"
+animation = &"death"
 autoplay = "idle_side"
-frame_progress = 0.45424
 
 [node name="detection" type="Area2D" parent="AnimatedSprite2D"]
 collision_layer = 2
@@ -550,9 +552,20 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/detection"]
 shape = SubResource("CircleShape2D_xo02r")
 
+[node name="enemy_hit_box" type="Area2D" parent="AnimatedSprite2D/detection"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/detection/enemy_hit_box"]
+shape = SubResource("CircleShape2D_ydo77")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -5)
 shape = SubResource("CircleShape2D_hb2qo")
 
+[node name="take_damage_cooldown" type="Timer" parent="."]
+wait_time = 0.5
+
 [connection signal="body_entered" from="AnimatedSprite2D/detection" to="." method="_on_detection_body_entered"]
 [connection signal="body_exited" from="AnimatedSprite2D/detection" to="." method="_on_detection_body_exited"]
+[connection signal="body_entered" from="AnimatedSprite2D/detection/enemy_hit_box" to="." method="_on_enemy_hit_box_body_entered"]
+[connection signal="body_exited" from="AnimatedSprite2D/detection/enemy_hit_box" to="." method="_on_enemy_hit_box_body_exited"]
+[connection signal="timeout" from="take_damage_cooldown" to="." method="_on_take_damage_cooldown_timeout"]
